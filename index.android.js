@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
+  apiKey: "YOUR_API_KET",
   authDomain: "YOUR_DOMAIN",
   databaseURL: "YOUR_DB_URL",
   storageBucket: "YOUR_BUCKET"
@@ -32,38 +32,32 @@ export default class nativefirebase extends Component {
     this.state = { description: '', todos: [] };
   }
   
-  keyExtractor = (item) => item.description;
+  keyExtractor = (item) => item.id;
 
   renderItem = ({item}) =>
   <View >
-    <Text>{item}</Text>
+    <Text>{item.description}, {item.date}</Text>   
   </View>;
 
   saveData = () => {
-    fetch('https://YOUR_PROJECT.firebaseio.com/todos.json', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        description: this.state.description,
-        date: new Date()
-      })
-    }) 
+    let dat = new Date();
+    let datString = (dat.getMonth() + 1) + "-" + dat.getDate() + "-" + dat.getFullYear();
+    this.itemsRef.push({ description: this.state.description, date: datString});
+
+
   };
 
+  // List todos
   listenForItems(itemsRef) {
     itemsRef.on('value', (snap) => {
       var items = [];
       snap.forEach((child) => {
-        items.push(
-          child.val().description,
-        );
+        items.push({
+          id: child.key,
+          description: child.val().description,
+          date: child.val().date,
+        });
       });
-
-      var s= JSON.stringify(items);
-      console.log("s: " + s);
 
       this.setState({
         todos: items
