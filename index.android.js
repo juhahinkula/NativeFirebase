@@ -13,6 +13,7 @@ import {
   TextInput,
   Button,
   FlatList,
+  Modal,
   View
 } from 'react-native';
 
@@ -31,7 +32,7 @@ export default class nativefirebase extends Component {
     super(props);
     //realtime listener for firebase db
     this.itemsRef = firebaseApp.database().ref('todos');
-    this.state = { description: '', todos: [], date: '' };
+    this.state = { description: '', todos: [], date: '', modalVisible: false,};
   }
   
   keyExtractor = (item) => item.id;
@@ -45,7 +46,7 @@ export default class nativefirebase extends Component {
     if (this.state.description != '' && this.state.date != '') {
       this.itemsRef.push({ description: this.state.description, date: this.state.date});
       this.refs.toast.show('Todo saved');
-      this.setState({date: ''});
+      this.setState({date: '', modalVisible: false});
     }
     else {
       this.refs.toast.show('Some data is missing');      
@@ -64,10 +65,7 @@ export default class nativefirebase extends Component {
         });
       });
 
-      this.setState({
-        todos: items
-      });
-
+      this.setState({todos: items});
     });
   }
 
@@ -78,12 +76,14 @@ export default class nativefirebase extends Component {
   render() {
     return (
       <View style={styles.maincontainer}>
+        <Modal animationType="slide" transparent={false} visible={this.state.modalVisible}>
         <View style={styles.inputcontainer}>
           <TextInput
           style={{height: 40, width: 200, borderColor: 'gray', borderWidth: 1, marginBottom: 7}}
           onChangeText={(description) => this.setState({description})}
           value={this.state.text}
-          placeholder="description"/>
+          placeholder="description"
+          />
           <DatePicker
           style={{width: 200, marginBottom: 7}}
           date={this.state.date}
@@ -97,10 +97,13 @@ export default class nativefirebase extends Component {
               top: 4,
             },
           }}
-          onDateChange={(date) => {this.setState({date: date})}}/>         
+          onDateChange={(date) => {this.setState({date: date})}}
+          />         
           <Button onPress={this.saveData} title="Save" /> 
         </View>
+        </Modal>
         <View style={styles.listcontainer}>
+          <Button title="Add" onPress={() => this.setState({modalVisible: true})} />
           <FlatList
             data = {this.state.todos}
             keyExtractor = {this.keyExtractor}
@@ -127,7 +130,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
   },
   listcontainer: {
-    flex: 3,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
