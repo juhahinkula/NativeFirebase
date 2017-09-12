@@ -38,12 +38,18 @@ export default class nativefirebase extends Component {
 
   renderItem = ({item}) =>
   <View >
-    <Text>{item.description}, {item.date}</Text>   
+    <Text style={{fontSize: 20}}>{item.description}, {item.date}</Text>   
   </View>;
 
   saveData = () => {
-    this.itemsRef.push({ description: this.state.description, date: this.state.date});
-    this.refs.toast.show('Todo saved');
+    if (this.state.description != '' && this.state.date != '') {
+      this.itemsRef.push({ description: this.state.description, date: this.state.date});
+      this.refs.toast.show('Todo saved');
+      this.setState({date: ''});
+    }
+    else {
+      this.refs.toast.show('Some data is missing');      
+    }
   };
 
   // List todos
@@ -74,33 +80,24 @@ export default class nativefirebase extends Component {
       <View style={styles.maincontainer}>
         <View style={styles.inputcontainer}>
           <TextInput
-          style={{height: 40, width: 200, borderColor: 'gray', borderWidth: 1}}
+          style={{height: 40, width: 200, borderColor: 'gray', borderWidth: 1, marginBottom: 7}}
           onChangeText={(description) => this.setState({description})}
           value={this.state.text}
-          placeholder="description"
-          />
+          placeholder="description"/>
           <DatePicker
-          style={{width: 200}}
+          style={{width: 200, marginBottom: 7}}
           date={this.state.date}
           mode="date"
           placeholder="select date"
           format="YYYY-MM-DD" 
-          confirmBtnText="Confirm"
-          cancelBtnText="Cancel"
           customStyles={{
             dateIcon: {
               position: 'absolute',
               left: 0,
               top: 4,
-              marginLeft: 0
             },
-            dateInput: {
-              marginLeft: 36
-            }
-            // ... You can check the source to find the other keys.
           }}
-          onDateChange={(date) => {this.setState({date: date})}}
-        />         
+          onDateChange={(date) => {this.setState({date: date})}}/>         
           <Button onPress={this.saveData} title="Save" /> 
         </View>
         <View style={styles.listcontainer}>
