@@ -4,6 +4,8 @@
 
 import React, { Component } from 'react';
 import * as firebase from 'firebase';
+import Toast, {DURATION} from 'react-native-easy-toast';
+import DatePicker from 'react-native-datepicker';
 import {
   AppRegistry,
   StyleSheet,
@@ -15,10 +17,10 @@ import {
 } from 'react-native';
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KET",
-  authDomain: "YOUR_DOMAIN",
-  databaseURL: "YOUR_DB_URL",
-  storageBucket: "YOUR_BUCKET"
+  apiKey: "AIzaSyBPA0cO9zhmh0LscOORL_OG0IB7MA57Edw",
+  authDomain: "reactexample-ea128.firebaseapp.com",
+  databaseURL: "https://reactexample-ea128.firebaseio.com",
+  storageBucket: "reactexample-ea128.appspot.com"
 };
 
 const firebaseApp = firebase.initializeApp(firebaseConfig);
@@ -29,7 +31,7 @@ export default class nativefirebase extends Component {
     super(props);
     //realtime listener for firebase db
     this.itemsRef = firebaseApp.database().ref('todos');
-    this.state = { description: '', todos: [] };
+    this.state = { description: '', todos: [], date: '' };
   }
   
   keyExtractor = (item) => item.id;
@@ -40,11 +42,8 @@ export default class nativefirebase extends Component {
   </View>;
 
   saveData = () => {
-    let dat = new Date();
-    let datString = (dat.getMonth() + 1) + "-" + dat.getDate() + "-" + dat.getFullYear();
-    this.itemsRef.push({ description: this.state.description, date: datString});
-
-
+    this.itemsRef.push({ description: this.state.description, date: this.state.date});
+    this.refs.toast.show('Todo saved');
   };
 
   // List todos
@@ -78,7 +77,30 @@ export default class nativefirebase extends Component {
           style={{height: 40, width: 200, borderColor: 'gray', borderWidth: 1}}
           onChangeText={(description) => this.setState({description})}
           value={this.state.text}
+          placeholder="description"
           />
+          <DatePicker
+          style={{width: 200}}
+          date={this.state.date}
+          mode="date"
+          placeholder="select date"
+          format="YYYY-MM-DD" 
+          confirmBtnText="Confirm"
+          cancelBtnText="Cancel"
+          customStyles={{
+            dateIcon: {
+              position: 'absolute',
+              left: 0,
+              top: 4,
+              marginLeft: 0
+            },
+            dateInput: {
+              marginLeft: 36
+            }
+            // ... You can check the source to find the other keys.
+          }}
+          onDateChange={(date) => {this.setState({date: date})}}
+        />         
           <Button onPress={this.saveData} title="Save" /> 
         </View>
         <View style={styles.listcontainer}>
@@ -87,7 +109,8 @@ export default class nativefirebase extends Component {
             keyExtractor = {this.keyExtractor}
             renderItem = {this.renderItem}
             />
-        </View>        
+        </View>
+        <Toast ref="toast" position="top"/>        
       </View>
     );
   }
@@ -102,7 +125,6 @@ const styles = StyleSheet.create({
   },
   inputcontainer: {
     flex: 1,
-    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
