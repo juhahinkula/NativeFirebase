@@ -34,7 +34,7 @@ export default class nativefirebase extends Component {
     this.itemsRef = firebaseApp.database().ref('todos');
     this.state = { description: '', todos: [], date: '', modalVisible: false,};
   }
-  
+
   keyExtractor = (item) => item.id;
 
   renderItem = ({item}) =>
@@ -76,7 +76,8 @@ export default class nativefirebase extends Component {
   render() {
     return (
       <View style={styles.maincontainer}>
-        <Modal animationType="slide" transparent={false} visible={this.state.modalVisible}>
+        <Modal animationType="slide" transparent={false} visible={this.state.modalVisible}
+        onRequestClose={() => {}} >
         <View style={styles.inputcontainer}>
           <TextInput
           style={{height: 40, width: 200, borderColor: 'gray', borderWidth: 1, marginBottom: 7}}
@@ -102,12 +103,16 @@ export default class nativefirebase extends Component {
           <Button onPress={this.saveData} title="Save" /> 
         </View>
         </Modal>
-        <View style={styles.listcontainer}>
+        <View style={styles.headercontainer}>                  
+          <Text style={{fontSize: 20, marginRight: 40}}>ALL TODOS</Text>   
           <Button title="Add" onPress={() => this.setState({modalVisible: true})} />
+        </View>
+        <View style={styles.listcontainer}>
           <FlatList
             data = {this.state.todos}
             keyExtractor = {this.keyExtractor}
             renderItem = {this.renderItem}
+            style={{marginTop: 20}}
             />
         </View>
         <Toast ref="toast" position="top"/>        
@@ -123,6 +128,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
+  headercontainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
+  },  
   inputcontainer: {
     flex: 1,
     justifyContent: 'center',
@@ -130,7 +142,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
   },
   listcontainer: {
-    flex: 1,
+    flex: 10,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
